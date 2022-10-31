@@ -57,13 +57,13 @@ class ConsultaPrograma extends React.Component {
 
     buscaCpf = () => {
         try {
-
             this.ClienteService
                 .obterId(this.state.cpfCnpj).then(resposta => {
                     const resultado = resposta.data;
-                    this.cpfCnpj = resultado.nomeRazao
-                })
 
+                    resultado.idCliente = resultado.id;
+                    this.setState({ nomeRazao: resultado.nomeRazao, idCliente: resultado.idCliente })
+                })
         } catch (erro) {
             messages.mensagemErro("CPF não esta cadastrado na base de dados")
             return false;
@@ -81,7 +81,7 @@ class ConsultaPrograma extends React.Component {
     }
 
     fecharModalCadastro = () => {
-        this.setState({ showConfirmCadastro: false, descricao: '', cpfCnpj: '', idCliente: '' })
+        this.setState({ showConfirmCadastro: false, descricao: '', cpfCnpj: '', nomeRazao: '', idCliente: '', atualizando: false })
     }
     //------------------
     abrirModalEditar = (id) => {
@@ -91,6 +91,7 @@ class ConsultaPrograma extends React.Component {
                 .obterProgramaPorId(id)
                 .then(response => {
                     this.setState({ ...response.data, atualizando: true })
+
                 }).catch(erros => {
                     messages.mensagemErro(erros.response.data)
                 })
@@ -101,14 +102,14 @@ class ConsultaPrograma extends React.Component {
     }
 
     fecharModalEditar = () => {
-        this.setState({ showConfirmCadastro: false, programaEditar: {}, descricao: '', cpfCnpj: '', idCliente: '' })
+        this.setState({ showConfirmCadastro: false, programaEditar: {}, descricao: '', cpfCnpj: '', nomeRazao: '', idCliente: '', atualizando: false })
     }
     //------------------
     abrirConfirmacao = (programa) => {
         this.setState({ showConfirmDialog: true, programaDeletar: programa })
     }
     cancelarDelecao = () => {
-        this.setState({ showConfirmDialog: false, programaDeletar: {}, descricao: '', cpfCnpj: '', idCliente: '' })
+        this.setState({ showConfirmDialog: false, programaDeletar: {}, descricao: '', cpfCnpj: '', nomeRazao: '', idCliente: '', atualizando: false })
     }
 
 
@@ -129,6 +130,13 @@ class ConsultaPrograma extends React.Component {
             .then(response => {
                 this.showConfirmCadastro = false
                 messages.mensagemSucesso("Programa cadastrado com sucesso!");
+                this.fecharModalCadastro()
+                /*this.setState({
+                    programa:programa,
+                    showConfirmCadastro:false
+                })*/
+
+                this.componentDidMount();
             }).catch(error => {
                 messages.mensagemErro(error.response.data)
             })
@@ -136,14 +144,18 @@ class ConsultaPrograma extends React.Component {
     }
 
     atualizar = () => {
-        const { descricao, idCliente } = this.state;
-        const programa = { descricao, idCliente }
-
+        const { id,descricao, idCliente } = this.state;
+        const programa = { id,descricao, idCliente }
         this.ProgramaService
             .atualizar(programa)
             .then(response => {
-                //this.props.history.push('/programa')
                 messages.mensagemSucesso('Programa atualizado com sucesso')
+                this.fecharModalCadastro()
+                this.componentDidMount();
+                /*this.setState({
+                    programa:programa,
+                    showConfirmCadastro:false
+                })*/
             }).catch(error => {
                 messages.mensagemErro(error.response.data)
             })
@@ -175,7 +187,7 @@ class ConsultaPrograma extends React.Component {
     }
 
     render() {
-        const clientes='';
+        //const clientes = '';
 
         const confirmDialogFooterAdicionar = (
             <div>
@@ -249,8 +261,8 @@ class ConsultaPrograma extends React.Component {
                         onHide={() => this.setState({
                             showConfirmCadastro: false,
                             descricao: '',
-                            cpfCnpj: '',
-                            idCliente: ''
+                            cpfCnpj: '', nomeRazao: '',
+                            idCliente: '', atualizando: false
                         })}>
                         <div className="row">
                             <div className="col-md-12">
@@ -266,23 +278,26 @@ class ConsultaPrograma extends React.Component {
                             </div>
                         </div>
                         <div className="row">
-                            <div className="col-md-8">
+                            <div className="col-md-7">
                                 <FormGroup htmlFor="inputCliente" label="Programa: *">
-                                    <SelectMenu id='inputCliente'
-                                                value={this.state.idCliente}
-                                                lista={clientes}
-                                                name='clientes'
-                                                className="form-control" />
-                                    
+                                    <input type="text"
+                                        id="inputCliente"
+                                        className="form-control"
+                                        name="name" readOnly
+                                        value={this.state.nomeRazao}
+                                        onChange={e => this.setState({ nomeRazao: e.target.value })}
+                                        placeholder="" />
                                 </FormGroup>
                             </div>
+
+
                             <div className="col-md-1">
                                 <button onClick={this.buscaCpf} className="btn btn-success" style={{ marginTop: '24px' }}>
                                     <i className="pi pi-search mr-2"></i>
                                 </button>
                             </div>
 
-                            <div className="col-md-3">
+                            <div className="col-md-4">
                                 <FormGroup htmlFor="inputCnpj" label="Cnpj: *">
                                     <input type="text"
                                         id="inputCnpj"
@@ -292,8 +307,18 @@ class ConsultaPrograma extends React.Component {
                                         onChange={e => this.setState({ cpfCnpj: e.target.value })}
                                         placeholder="" />
                                 </FormGroup>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="col-md-1">
 
-
+                                <input type="hidden"
+                                    id="inputCliente"
+                                    className="form-control"
+                                    name="name" disabled
+                                    value={this.state.idCliente}
+                                    onChange={e => this.setState({ idCliente: e.target.value })}
+                                    placeholder="" style={{ marginTop: '24px' }} />
                             </div>
                         </div>
 
@@ -308,15 +333,6 @@ class ConsultaPrograma extends React.Component {
         )
     }
 }
-/*
-<input type="text"
-                                        id="inputCliente"
-                                        className="form-control"
-                                        name="name"
-                                        value={this.state.idCliente}
-                                        onChange={e => this.setState({ idCliente: e.target.value })}
-                                        placeholder="" />
 
 
-*/
 export default withRouter(ConsultaPrograma)

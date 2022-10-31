@@ -12,6 +12,10 @@ import 'toastr/build/toastr.css';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
+
+import "bootstrap";
+
+
 import ProvedorAutenticacao from "./ProvedorAutenticacao";
 
 class App extends React.Component{

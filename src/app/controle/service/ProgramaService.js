@@ -30,7 +30,7 @@ class ProgramaService extends ControleApiService{
     }
 
     obterProgramaPorId(id){
-        return this.get(`/${id}`)
+        return this.get(`/programa/${id}`)
     }
 
     /*obterPrograma(){

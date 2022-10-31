@@ -10,6 +10,7 @@ import ConsultaCliente from '../views/pcmais/cliente/ConsultaCliente'
 import CadastroCliente from '../views/pcmais/cliente/CadastroCliente'
 import ConsultaPrograma from '../views/controle/programa/ConsultaPrograma'
 import CadastroPrograma from '../views/controle/programa/CadastroPrograma'
+import ConsultaContratante from '../views/controle/contratante/ConsultaContratante'
 
 function RotaAutenticada({component:Component, isUsuarioAutenticado,...props}){
     return(
@@ -42,6 +43,7 @@ function Rotas(props){
                 <RotaAutenticada isUsuarioAutenticado={props.isUsuarioAutenticado} path="/programa" component={ConsultaPrograma}/>
                 <RotaAutenticada isUsuarioAutenticado={props.isUsuarioAutenticado} path="/cadastro-programa/:id?" component={CadastroPrograma}/>
                 
+                <RotaAutenticada isUsuarioAutenticado={props.isUsuarioAutenticado} path="/contratante" component={ConsultaContratante} />
 
             </Switch>
         </HashRouter>
